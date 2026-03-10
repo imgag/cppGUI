@@ -9,6 +9,10 @@ DEFINES += CPPGUI_LIBRARY
 INCLUDEPATH += $$PWD/../cppCORE
 LIBS += -L$$PWD/../../bin -lcppCORE
 
+#include cppPLOTS library
+INCLUDEPATH += $$PWD/../cppPLOTS
+LIBS += -L$$PWD/../../bin -lcppPLOTS
+
 SOURCES += \
     Application.cpp \
     GUIHelper.cpp \
