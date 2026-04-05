@@ -16,6 +16,7 @@ SOURCES += \
     ClickableLabel.cpp \
     ClickableLineEdit.cpp \
     ColorSelector.cpp \
+    MarkdownEditor.cpp \
     ScrollableTextDialog.cpp \
     BusyDialog.cpp \
     QrCodeGenerator/BitBuffer.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     ClickableLabel.h \
     ClickableLineEdit.h \
     ColorSelector.h \
+    MarkdownEditor.h \
     ScrollableTextDialog.h \
     BusyDialog.h \
     QrCodeGenerator/BitBuffer.h \
@@ -47,6 +49,7 @@ RESOURCES += \
     resources.qrc
 
 FORMS += \
+    MarkdownEditor.ui \
     ScrollableTextDialog.ui \
     BusyDialog.ui \
     TsvTableWidget.ui
