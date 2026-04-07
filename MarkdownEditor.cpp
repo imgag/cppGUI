@@ -44,6 +44,12 @@ void MarkdownEditor::loadFile(QString filename)
 void MarkdownEditor::storeFile()
 {
 	Helper::storeTextFile(file_, ui_->plain->toPlainText().split("\n"));
+
+	if (is_modified_)
+	{
+		is_modified_ = false;
+		emit modificationStateChanged();
+	}
 }
 
 void MarkdownEditor::clear()
@@ -61,6 +67,8 @@ void MarkdownEditor::clear()
 
 void MarkdownEditor::setHighlightStrings(QStringList strings)
 {
+	Helper::trim(strings);
+	strings.removeAll("");
 	highlight_ = strings;
 
 	updateHTML();
@@ -129,40 +137,51 @@ void MarkdownEditor::openExternalLink(QUrl url)
 
 void MarkdownEditor::textChanged()
 {
-	if (!is_modified_) emit modificationStateChanged();
-	is_modified_ = true;
+	if (!is_modified_)
+	{
+		is_modified_ = true;
+		emit modificationStateChanged();
+	}
 
 	updateHTML();
 }
 
 void MarkdownEditor::updateHTML()
 {
-	QString text = markdownToHtml(ui_->plain->toPlainText());
-
-	//highlight search terms
-	const QString start_tag = "<span style=\"background-color: yellow;\">";
-	const QString end_tag = "</span>";
-	int index = -1;
-	foreach(const QString& term, highlight_)
-	{
-		int from_index = 0;
-		while((index = text.indexOf(term, from_index, Qt::CaseInsensitive))!=-1)
-		{
-			text.insert(index, start_tag);
-			text.insert(index+start_tag.length()+term.length(), end_tag);
-			from_index =index+start_tag.length()+term.length()+end_tag.length();
-		}
-	}
-
 	//store scrollbar position
 	int scroll_pos = ui_->html->verticalScrollBar()->value();
 
 	//update
 	ui_->html->setSearchPaths(QStringList() << file_folder_);
-	ui_->html->setHtml(text);
+	ui_->html->setHtml(markdownToHtml(ui_->plain->toPlainText()));
 
 	//restore scrollbar position
 	ui_->html->verticalScrollBar()->setValue(scroll_pos);
+
+	//highlight search
+	QList<QTextEdit::ExtraSelection> selections;
+	for(const QString& term: std::as_const(highlight_))
+	{
+
+		QTextDocument* doc = ui_->html->document();
+		QTextCursor cursor(doc);
+		while (!cursor.isNull() && !cursor.atEnd())
+		{
+			cursor = doc->find(term, cursor);
+
+			if (!cursor.isNull())
+			{
+				QTextEdit::ExtraSelection sel;
+				sel.cursor = cursor;
+
+				sel.format.setBackground(Qt::yellow);
+				sel.format.setForeground(Qt::black);
+
+				selections.append(sel);
+			}
+		}
+	}
+	ui_->html->setExtraSelections(selections);
 }
 
 struct ElementPos {
