@@ -3,9 +3,12 @@
 #include "Helper.h"
 #include <QDesktopServices>
 #include <QFileInfo>
+#include <QMenu>
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QUrl>
+#include <QClipboard>
+#include <QRegularExpression>
 
 MarkdownEditor::MarkdownEditor(QWidget* parent)
 	: QWidget(parent)
@@ -13,6 +16,7 @@ MarkdownEditor::MarkdownEditor(QWidget* parent)
 {
 	ui_->setupUi(this);
 	connect(ui_->html, SIGNAL(anchorClicked(QUrl)), this, SLOT(openExternalLink(QUrl)));
+	connect(ui_->html, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuHtml(QPoint)));
 	connect(ui_->plain, SIGNAL(textChanged()), this, SLOT(textChanged()));
 }
 
@@ -153,7 +157,7 @@ void MarkdownEditor::updateHTML()
 
 	//update
 	ui_->html->setSearchPaths(QStringList() << file_folder_);
-	ui_->html->setHtml(markdownToHtml(ui_->plain->toPlainText()));
+	ui_->html->setHtml(markdownToHtml(ui_->plain->toPlainText(), true));
 
 	//restore scrollbar position
 	ui_->html->verticalScrollBar()->setValue(scroll_pos);
@@ -205,19 +209,31 @@ QList<ElementPos> findHtmlElements(QString html, QStringList tags)
 			if (endStartTag == -1)
 				break;
 
-			int endTag = html.indexOf("</" + tag + ">", endStartTag, Qt::CaseInsensitive);
-			if (endTag == -1)
-				break;
+			int endTagPos = -1;
 
-			result.append({tag, startTag, endTag + tag.length() + 3});
-			// +3 for "</" and ">"
-			pos = endTag + tag.length() + 3;
+			//Check for self-closing tag
+			if (html.mid(startTag, endStartTag - startTag + 1).contains("/>"))
+			{
+				endTagPos = endStartTag + 1;
+			}
+			else
+			{
+				int endTag = html.indexOf("</" + tag + ">", endStartTag, Qt::CaseInsensitive);
+				if (endTag == -1)
+					break;
+
+				endTagPos = endTag + tag.length() + 3; // "</" + tag + ">"
+			}
+
+			result.append({tag, startTag, endTagPos});
+			pos = endTagPos;
 		}
 	}
+
 	return result;
 }
 
-QString MarkdownEditor::markdownToHtml(QString in)
+QString MarkdownEditor::markdownToHtml(QString in, bool prescale_images)
 {
 	if(in.size()==0) return "";
 
@@ -226,7 +242,7 @@ QString MarkdownEditor::markdownToHtml(QString in)
 	doc.setMarkdown(in);
 	QString html = doc.toHtml();
 
-	//style html
+	//style headers and tables
 	QList<ElementPos> elements = findHtmlElements(html, QStringList{"h1", "h2", "h3", "td"});
 	for (int i=elements.count()-1; i>=0; --i) //reverse order to make the positions correct
 	{
@@ -253,7 +269,38 @@ QString MarkdownEditor::markdownToHtml(QString in)
 		}
 		html.replace(e.start, e.end-e.start, text);
 	}
-	//Helper::storeTextFile("C:\\Users\\sturm\\Desktop\\test.html", QStringList() << html);
+
+	//prevent scaling of images by setting the width to the opposite of the scale factor (when Qt scales images up, it looks ugly)
+	if (qApp->devicePixelRatio()>1 && prescale_images)
+	{
+		QList<ElementPos> elements = findHtmlElements(html, QStringList{"img"});
+		for (int i=elements.count()-1; i>=0; --i) //reverse order to make the positions correct
+		{
+			const ElementPos& e = elements[i];
+			QString text = html.mid(e.start, e.end - e.start);
+			if (e.tag=="img")
+			{
+				//find filename
+				QRegularExpression re(R"(src\s*=\s*["']([^"']+)["'])");
+				QRegularExpressionMatch match = re.match(text);
+				if (match.hasMatch())
+				{
+					QString filename = match.captured(1);
+					if (!QFile::exists(filename))
+					{
+						filename = file_folder_ + filename;
+					}
+					if (QFile::exists(filename))
+					{
+						QImage img(filename);
+						text = text.insert(4 , " width="+QString::number(img.width()/qApp->devicePixelRatio())+" height="+QString::number(img.height()/qApp->devicePixelRatio()));
+					}
+				}
+			}
+			html.replace(e.start, e.end-e.start, text);
+		}
+	}
+
 	return html;
 }
 
@@ -269,5 +316,18 @@ void MarkdownEditor::askIfFileShouldBeStored()
 	if (box.exec() == QMessageBox::Yes)
 	{
 		storeFile();
+	}
+}
+
+void MarkdownEditor::contextMenuHtml(QPoint pos)
+{
+	QMenu menu(this);
+	QAction* copy = menu.addAction("Copy HTML");
+
+	QAction* action = menu.exec(ui_->html->mapToGlobal(pos));
+
+	if (action==copy)
+	{
+		QApplication::clipboard()->setText(markdownToHtml(ui_->plain->toPlainText(), false));
 	}
 }

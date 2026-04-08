@@ -56,8 +56,9 @@ protected slots:
 	void openExternalLink(QUrl url);
 	void textChanged();
 	void updateHTML();
-	static QString markdownToHtml(QString in);
+	QString markdownToHtml(QString in, bool prescale_images);
 	void askIfFileShouldBeStored();
+	void contextMenuHtml(QPoint pos);
 
 private:
 	Ui::MarkdownEditor* ui_;
