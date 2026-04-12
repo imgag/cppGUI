@@ -33,6 +33,7 @@ void MarkdownEditor::loadFile(QString filename)
 	if (!info.exists())
 	{
 		clear();
+		return;
 	}
 
 	//store file name and paths
