@@ -26,6 +26,8 @@ public:
 	void setFont(QFont font);
 	//Set base folder for links
 	void setBaseFolder(QString folder);
+	//Set if empy lines at the end of files are trimmed when storing (default is false).
+	void setEndTrimming(bool enable);
 
 	//Returns if the file was modified
 	bool isModified() const { return is_modified_;}
@@ -65,8 +67,9 @@ private:
 	QString file_; //canonical path
 	QString file_folder_; //canonical path of the file folder
 	QString base_folder_; //canonocal path of the base folder (links can be relative to this)
-	bool is_modified_;
+	bool is_modified_ = false;
 	QStringList highlight_;
+	bool end_trimming_ = false;
 };
 
 #endif // MARKDOWNEDITOR_H

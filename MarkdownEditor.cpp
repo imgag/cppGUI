@@ -47,8 +47,22 @@ void MarkdownEditor::loadFile(QString filename)
 
 void MarkdownEditor::storeFile()
 {
-	Helper::storeTextFile(file_, ui_->plain->toPlainText().split("\n"));
+	//split
+	QStringList lines = ui_->plain->toPlainText().split("\n");
 
+	//remove empty lines
+	if (end_trimming_)
+	{
+		while (!lines.isEmpty() && lines.last().trimmed().isEmpty())
+		{
+			lines.removeLast();
+		}
+	}
+
+	//store
+	Helper::storeTextFile(file_, lines);
+
+	//handle modification status
 	if (is_modified_)
 	{
 		is_modified_ = false;
@@ -109,6 +123,11 @@ void MarkdownEditor::setBaseFolder(QString folder)
 	{
 		base_folder_ = QFileInfo(folder).canonicalFilePath() + "/";
 	}
+}
+
+void MarkdownEditor::setEndTrimming(bool enable)
+{
+	end_trimming_ = enable;
 }
 
 void MarkdownEditor::openExternalLink(QUrl url)
