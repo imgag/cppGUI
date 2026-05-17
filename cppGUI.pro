@@ -10,6 +10,7 @@ INCLUDEPATH += $$PWD/../cppCORE
 LIBS += -L$$PWD/../../bin -lcppCORE
 
 SOURCES += \
+    AboutDialog.cpp \
     Application.cpp \
     GUIHelper.cpp \
     FileChooser.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
     ImageLabel.cpp
 
 HEADERS += \
+    AboutDialog.h \
     Application.h \
     GUIHelper.h \
     FileChooser.h \
@@ -49,6 +51,7 @@ RESOURCES += \
     resources.qrc
 
 FORMS += \
+    AboutDialog.ui \
     MarkdownEditor.ui \
     ScrollableTextDialog.ui \
     BusyDialog.ui \
