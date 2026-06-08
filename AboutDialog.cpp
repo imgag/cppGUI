@@ -20,6 +20,7 @@ AboutDialog::AboutDialog(QWidget *parent)
 
 	//lib versions
 	QString lib_versions;
+	lib_versions += "Operating system: " + QSysInfo::prettyProductName() + "<br>";
 	lib_versions += "Architecture: " + QSysInfo::buildCpuArchitecture() + "<br>";
 	lib_versions += "Qt version: " + QLibraryInfo::version().toString();
 	ui_->lib_versions->setText(lib_versions);
