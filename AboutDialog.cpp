@@ -2,6 +2,7 @@
 #include <QLibraryInfo>
 #include <QSysInfo>
 #include "ui_AboutDialog.h"
+#include "ToolBase.h"
 
 AboutDialog::AboutDialog(QWidget *parent)
 	: QDialog(parent)
@@ -16,7 +17,7 @@ AboutDialog::AboutDialog(QWidget *parent)
 	ui_->name->setText(QApplication::applicationName());
 
 	//version
-	ui_->version->setText(QCoreApplication::applicationVersion());
+	ui_->version->setText(QCoreApplication::applicationVersion() + " (" + ToolBase::date() + ")");
 
 	//lib versions
 	QString lib_versions;
