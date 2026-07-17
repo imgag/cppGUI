@@ -226,6 +226,7 @@ QTableWidgetItem* GUIHelper::createTableItem(double value, int prec, Qt::Alignme
 	else
 	{
 		item->setData(Qt::EditRole, QString::number(value, 'f', prec).toDouble());
+		item->setText(QLocale::system().toString(value, 'f', prec));
 	}
 	item->setTextAlignment(alignment);
 	item->setFlags(flags);
