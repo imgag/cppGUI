@@ -226,7 +226,6 @@ QTableWidgetItem* GUIHelper::createTableItem(double value, int prec, Qt::Alignme
 	else
 	{
 		item->setData(Qt::EditRole, QString::number(value, 'f', prec).toDouble());
-		item->setText(QLocale::system().toString(value, 'f', prec));
 	}
 	item->setTextAlignment(alignment);
 	item->setFlags(flags);
@@ -292,7 +291,7 @@ QList<int> GUIHelper::selectedTableColumns(const QTableWidget* table, bool skip_
 	return output;
 }
 
-void GUIHelper::copyToClipboard(const QTableWidget* table, bool selected_rows_only, const QStringList& comments)
+void GUIHelper::copyToClipboard(const QTableWidget* table, bool selected_rows_only, bool convert_numbers_to_locale, const QStringList& comments)
 {
 	//get selected rows
 	QList<int> all_selected_rows = selectedTableRows(table);
@@ -331,7 +330,26 @@ void GUIHelper::copyToClipboard(const QTableWidget* table, bool selected_rows_on
 			QTableWidgetItem* item  = table->item(row, col);
 			if (item!=nullptr)
 			{
-				text = item->text();
+				if (convert_numbers_to_locale)
+				{
+					QMetaType type = item->data(Qt::EditRole).metaType();
+					if(type==QMetaType::fromType<int>())
+					{
+						text = QLocale::system().toString(item->data(Qt::EditRole).toInt());
+					}
+					else if(type==QMetaType::fromType<double>())
+					{
+						text = QLocale::system().toString(item->data(Qt::EditRole).toDouble());
+					}
+					else
+					{
+						text = item->text();
+					}
+				}
+				else
+				{
+					text = item->text();
+				}
 			}
 			else
 			{
