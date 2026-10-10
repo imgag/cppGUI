@@ -46,18 +46,14 @@ void ParameterEditor::load(ParameterList& parameters)
 			help += "\n" + QString::fromUtf8(Parameter::toString(it.key())) + ": " + it.value().toString();
 		}
 		editor->setToolTip(help.trimmed());
-		auto* row = new QWidget;
-		auto* row_layout = new QVBoxLayout(row);
-		row_layout->setContentsMargins(0, 0, 0, 0);
-		row_layout->addWidget(editor);
-		auto* error = new QLabel(row);
+		auto* error = new QLabel;
 		error->setWordWrap(true);
 		error->setStyleSheet("color: #b00020;");
-		row_layout->addWidget(error);
-		auto* label = new QLabel(QString::fromUtf8(parameter.name()), row);
+		auto* label = new QLabel(QString::fromUtf8(parameter.name()));
 		label->setToolTip(help.trimmed());
 		label->setBuddy(editor);
-		ui_->form->addRow(label, row);
+		ui_->form->addRow(label, editor);
+		ui_->form->addRow(static_cast<QWidget*>(nullptr), error);
 		fields_.append({parameter, editor, error, parameter.value()});
 		setEditorValue(fields_.last(), parameter.value());
 	}
