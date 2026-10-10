@@ -4,5 +4,6 @@
         <file>Icons/Splitter_horizontal.png</file>
         <file>Icons/Clipboard.png</file>
         <file>Icons/Info.png</file>
+        <file>Icons/settings.png</file>
     </qresource>
 </RCC>

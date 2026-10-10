@@ -17,6 +17,7 @@ SOURCES += \
     ClickableLineEdit.cpp \
     ColorSelector.cpp \
     MarkdownEditor.cpp \
+    ParameterEditor.cpp \
     ScrollableTextDialog.cpp \
     BusyDialog.cpp \
     DelayedInitializationTimer.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     ClickableLineEdit.h \
     ColorSelector.h \
     MarkdownEditor.h \
+    ParameterEditor.h \
     ScrollableTextDialog.h \
     BusyDialog.h \
     DelayedInitializationTimer.h \
@@ -43,6 +45,7 @@ RESOURCES += \
 FORMS += \
     AboutDialog.ui \
     MarkdownEditor.ui \
+    ParameterEditor.ui \
     ScrollableTextDialog.ui \
     BusyDialog.ui \
     TsvTableWidget.ui
