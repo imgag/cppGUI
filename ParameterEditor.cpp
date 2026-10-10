@@ -43,6 +43,7 @@ void ParameterEditor::load(ParameterList& parameters)
 		QString help = parameter.description();
 		for (auto it = parameter.constraints().cbegin(); it != parameter.constraints().cend(); ++it)
 		{
+			if (it.key() == ConstraintType::DISPLAY_DIGITS) continue;
 			help += "\n" + QString::fromUtf8(Parameter::toString(it.key())) + ": " + it.value().toString();
 		}
 		editor->setToolTip(help.trimmed());
@@ -54,7 +55,7 @@ void ParameterEditor::load(ParameterList& parameters)
 		label->setBuddy(editor);
 		ui_->form->addRow(label, editor);
 		ui_->form->addRow(static_cast<QWidget*>(nullptr), error);
-		fields_.append({parameter, editor, error, parameter.value()});
+		fields_.append({parameter, editor, error, parameter.value(), {}, {}});
 		setEditorValue(fields_.last(), parameter.value());
 	}
 	connect(&parameters, &ParameterList::constraintsChanged, this, [this]()
@@ -139,11 +140,13 @@ QVariant ParameterEditor::editorValue(const Field& field) const
 		return QVariant::fromValue(values);
 	}
 	const QString text = qobject_cast<QLineEdit*>(field.editor)->text();
+	//Formatting is display-only: unchanged text retains the original precision.
+	if (field.parameter.type() == ParameterType::DOUBLE && text == field.displayed_text) return field.displayed_value;
 	if (field.parameter.type() == ParameterType::STRING) return text.toUtf8();
 	return text;
 }
 
-void ParameterEditor::setEditorValue(const Field& field, const QVariant& value)
+void ParameterEditor::setEditorValue(Field& field, const QVariant& value)
 {
 	if (auto* editor = qobject_cast<QCheckBox*>(field.editor)) editor->setChecked(value.toBool());
 	else if (auto* editor = qobject_cast<QComboBox*>(field.editor)) editor->setCurrentIndex(editor->findData(value));
@@ -160,8 +163,16 @@ void ParameterEditor::setEditorValue(const Field& field, const QVariant& value)
 	}
 	else
 	{
-		QString text = field.parameter.type() == ParameterType::DOUBLE
-			? QString::number(value.toDouble(), 'g', std::numeric_limits<double>::max_digits10) : value.toString();
+		QString text = value.toString();
+		if (field.parameter.type() == ParameterType::DOUBLE)
+		{
+			const auto& constraints = field.parameter.constraints();
+			text = constraints.contains(ConstraintType::DISPLAY_DIGITS)
+				? QString::number(value.toDouble(), 'f', constraints.value(ConstraintType::DISPLAY_DIGITS).toInt())
+				: QString::number(value.toDouble(), 'g', std::numeric_limits<double>::max_digits10);
+			field.displayed_value = value;
+			field.displayed_text = text;
+		}
 		qobject_cast<QLineEdit*>(field.editor)->setText(text);
 	}
 }
@@ -171,7 +182,7 @@ QHash<QByteArray, QVariant> ParameterEditor::validValues(bool& all_valid)
 	QHash<QByteArray, QVariant> values;
 	all_valid = !parameters_.isNull();
 	if (!parameters_) return values;
-	for (const Field& field : fields_)
+	for (const Field& field : std::as_const(fields_))
 	{
 		QString error;
 		try
@@ -234,7 +245,7 @@ bool ParameterEditor::store()
 void ParameterEditor::reset()
 {
 	updating_ = true;
-	for (const Field& field : fields_) setEditorValue(field, field.loaded_value);
+	for (Field& field : fields_) setEditorValue(field, field.loaded_value);
 	updating_ = false;
 	edited();
 }

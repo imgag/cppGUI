@@ -40,6 +40,8 @@ private:
 		QWidget* editor;
 		QLabel* error;
 		QVariant loaded_value;
+		QVariant displayed_value;
+		QString displayed_text;
 	};
 
 	QPointer<ParameterList> parameters_;
@@ -49,7 +51,7 @@ private:
 
 	QWidget* createEditor(const Parameter& parameter);
 	QVariant editorValue(const Field& field) const;
-	void setEditorValue(const Field& field, const QVariant& value);
+	void setEditorValue(Field& field, const QVariant& value);
 	QHash<QByteArray, QVariant> validValues(bool& all_valid);
 	bool applyValues(bool require_all_valid);
 	void edited();
