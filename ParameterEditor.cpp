@@ -48,18 +48,13 @@ void ParameterEditor::load(ParameterList& parameters)
 	{
 		QWidget* editor = createEditor(parameter);
 		editor->setObjectName(QString::fromUtf8(parameter.name()));
-		QString help = parameter.description();
-		for (auto it = parameter.constraints().cbegin(); it != parameter.constraints().cend(); ++it)
-		{
-			if (it.key() == ConstraintType::DISPLAY_DIGITS) continue;
-			help += "\n" + QString::fromUtf8(Parameter::toString(it.key())) + ": " + it.value().toString();
-		}
-		editor->setToolTip(help.trimmed());
+		QString help = parameter.description().trimmed();
+		editor->setToolTip(help);
 		auto* error = new QLabel;
 		error->setWordWrap(true);
 		error->setStyleSheet("color: #b00020;");
 		auto* label = new QLabel(QString::fromUtf8(parameter.name()));
-		label->setToolTip(help.trimmed());
+		label->setToolTip(help);
 		label->setBuddy(editor);
 		ui_->form->addRow(label, editor);
 		ui_->form->addRow(static_cast<QWidget*>(nullptr), error);
