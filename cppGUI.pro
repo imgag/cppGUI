@@ -12,11 +12,13 @@ LIBS += -L$$PWD/../../bin -lcppCORE
 SOURCES += \
     AboutDialog.cpp \
     Application.cpp \
+    ColorNames.cpp \
     GUIHelper.cpp \
     ClickableLabel.cpp \
     ClickableLineEdit.cpp \
     ColorSelector.cpp \
     MarkdownEditor.cpp \
+    ParameterEditor.cpp \
     ScrollableTextDialog.cpp \
     BusyDialog.cpp \
     DelayedInitializationTimer.cpp \
@@ -26,11 +28,13 @@ SOURCES += \
 HEADERS += \
     AboutDialog.h \
     Application.h \
+    ColorNames.h \
     GUIHelper.h \
     ClickableLabel.h \
     ClickableLineEdit.h \
     ColorSelector.h \
     MarkdownEditor.h \
+    ParameterEditor.h \
     ScrollableTextDialog.h \
     BusyDialog.h \
     DelayedInitializationTimer.h \
@@ -43,6 +47,7 @@ RESOURCES += \
 FORMS += \
     AboutDialog.ui \
     MarkdownEditor.ui \
+    ParameterEditor.ui \
     ScrollableTextDialog.ui \
     BusyDialog.ui \
     TsvTableWidget.ui
