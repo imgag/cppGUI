@@ -12,6 +12,7 @@ LIBS += -L$$PWD/../../bin -lcppCORE
 SOURCES += \
     AboutDialog.cpp \
     Application.cpp \
+    ColorNames.cpp \
     GUIHelper.cpp \
     ClickableLabel.cpp \
     ClickableLineEdit.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 HEADERS += \
     AboutDialog.h \
     Application.h \
+    ColorNames.h \
     GUIHelper.h \
     ClickableLabel.h \
     ClickableLineEdit.h \

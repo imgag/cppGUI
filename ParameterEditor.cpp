@@ -18,6 +18,7 @@ ParameterEditor::ParameterEditor(ParameterList& parameters, QWidget* parent)
 	, ui_(new Ui::ParameterEditor())
 {
 	ui_->setupUi(this);
+	setTitle(QString());
 	connect(ui_->apply, &QPushButton::clicked, this, [this]() { store(); });
 	connect(ui_->reset, &QPushButton::clicked, this, &ParameterEditor::reset);
 	connect(ui_->auto_apply, &QCheckBox::toggled, this, [this]() { edited(); });
@@ -27,6 +28,13 @@ ParameterEditor::ParameterEditor(ParameterList& parameters, QWidget* parent)
 ParameterEditor::~ParameterEditor()
 {
 	delete ui_;
+}
+
+void ParameterEditor::setTitle(const QString& title)
+{
+	ui_->title->setText(title);
+	ui_->title->setToolTip(title);
+	ui_->title->setVisible(!title.isEmpty());
 }
 
 void ParameterEditor::load(ParameterList& parameters)
@@ -213,7 +221,7 @@ bool ParameterEditor::applyValues(bool require_all_valid)
 	{
 		//Notify observers once, after all valid values have been updated.
 		QSignalBlocker blocker(parameters_);
-		for (const Field& field : fields_)
+		for (const Field& field : std::as_const(fields_))
 		{
 			const QByteArray& name = field.parameter.name();
 			if (!values.contains(name) || parameters_->parameter(name).value() == values.value(name)) continue;

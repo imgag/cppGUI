@@ -20,6 +20,8 @@ class CPPGUISHARED_EXPORT ParameterEditor : public QWidget
 public:
 	ParameterEditor(ParameterList& parameters, QWidget* parent = nullptr);
 	~ParameterEditor() override;
+	//Sets the heading above the buttons. An empty title hides it.
+	void setTitle(const QString& title);
 	//Binds the list and rebuilds the controls. Also called when its constraints change.
 	void load(ParameterList& parameters);
 	//Stores all fields if valid; returns false without changing the list otherwise.
