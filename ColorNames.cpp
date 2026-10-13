@@ -13,17 +13,17 @@ const QHash<QString, QColor> &ColorNames::colorMap()
 		{ "dark green",  QColor::fromRgb(0x137333) },
 		{ "dark red",    QColor::fromRgb(0xA61C24) },
 		{ "gray",        QColor::fromRgb(0x9E9E9E) },
-		{ "green",       QColor::fromRgb(0x34A853) },
+		{ "green",       QColor::fromRgb(0x00FF00) },
 		{ "light blue",  QColor::fromRgb(0x90CAF9) },
 		{ "light gray",  QColor::fromRgb(0xE0E0E0) },
 		{ "light green", QColor::fromRgb(0xA5D6A7) },
 		{ "light red",   QColor::fromRgb(0xF28B82) },
-		{ "orange",      QColor::fromRgb(0xFB8C00) },
+		{ "orange",      QColor::fromRgb(0xFF6400) },
 		{ "pink",        QColor::fromRgb(0xF48FB1) },
 		{ "purple",      QColor::fromRgb(0xAB47BC) },
-		{ "red",         QColor::fromRgb(0xE53935) },
+		{ "red",         QColor::fromRgb(0xFF0000) },
 		{ "white",       QColor::fromRgb(0xFFFFFF) },
-		{ "yellow",      QColor::fromRgb(0xFDD835) }
+		{ "yellow",      QColor::fromRgb(0xFFDF0F) }
 	};
 	return colors;
 }
@@ -34,6 +34,13 @@ QColor ColorNames::color(const QString &name)
 	auto it = colors.constFind(name.toLower());
 	if (it == colors.cend()) THROW(ArgumentException, "Unknown color name '" + name + "'!");
 	return it.value();
+}
+
+QString ColorNames::stringRGBA(const QString &name, int alpha)
+{
+	QColor c = color(name);
+	c.setAlpha(alpha);
+	return QString("rgba(%1, %2, %3, %4)").arg(c.red()).arg(c.green()).arg(c.blue()).arg(c.alphaF());
 }
 
 QStringList ColorNames::names()

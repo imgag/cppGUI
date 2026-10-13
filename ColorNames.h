@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COLORNAMES_H
+#define COLORNAMES_H
 
 #include "cppGUI_global.h"
 #include <QColor>
@@ -14,8 +15,13 @@ public:
 	static QStringList names();
 	//Returns a color by name (case-insensitive). Throws ArgumentException for unknown names.
 	static QColor color(const QString& name);
+	//Returns color string as RGBA usable in HTML/CSS. Throws ArgumentException for unknown names.
+	static QString stringRGBA(const QString& name, int alpha);
+
 
 protected:
 	ColorNames() = delete;
 	static const QHash<QString, QColor>& colorMap();
 };
+
+#endif
