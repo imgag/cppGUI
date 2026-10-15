@@ -10,6 +10,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QSignalBlocker>
+#include <QScopedValueRollback>
 #include <QVBoxLayout>
 #include <limits>
 
@@ -18,7 +19,7 @@ ParameterEditor::ParameterEditor(ParameterList& parameters, QWidget* parent)
 	, ui_(new Ui::ParameterEditor())
 {
 	ui_->setupUi(this);
-	setTitle(QString());
+	setName(QString());
 	connect(ui_->apply, &QPushButton::clicked, this, [this]() { store(); });
 	connect(ui_->reset, &QPushButton::clicked, this, &ParameterEditor::reset);
 	connect(ui_->auto_apply, &QCheckBox::toggled, this, [this]() { edited(); });
@@ -30,11 +31,18 @@ ParameterEditor::~ParameterEditor()
 	delete ui_;
 }
 
-void ParameterEditor::setTitle(const QString& title)
+void ParameterEditor::disableAutoApply()
 {
-	ui_->title->setText(title);
-	ui_->title->setToolTip(title);
-	ui_->title->setVisible(!title.isEmpty());
+	ui_->auto_apply->setChecked(false);
+	ui_->auto_apply->setVisible(false);
+}
+
+void ParameterEditor::setName(const QString& name)
+{
+	ui_->name->setText(name);
+	ui_->name->setToolTip(name);
+	ui_->label->setVisible(!name.isEmpty());
+	ui_->name->setVisible(!name.isEmpty());
 }
 
 void ParameterEditor::load(ParameterList& parameters)
@@ -63,7 +71,9 @@ void ParameterEditor::load(ParameterList& parameters)
 	}
 	connect(&parameters, &ParameterList::constraintsChanged, this, [this]()
 	{
-		if (parameters_) load(*parameters_);
+		//Applying may update dependent bounds. Keep the active input alive while editing.
+		//Validation reads the current constraints directly from the parameter list.
+		if (parameters_ && !applying_) load(*parameters_);
 	});
 	connect(&parameters, &QObject::destroyed, this, [this]() { setEnabled(false); });
 	setEnabled(true);
@@ -212,6 +222,7 @@ bool ParameterEditor::applyValues(bool require_all_valid)
 	const auto values = validValues(all_valid);
 	ui_->apply->setEnabled(all_valid);
 	if (!parameters_ || (require_all_valid && !all_valid)) return false;
+	QScopedValueRollback<bool> applying(applying_, true);
 	bool changed = false;
 	{
 		//Notify observers once, after all valid values have been updated.

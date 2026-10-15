@@ -20,8 +20,10 @@ class CPPGUISHARED_EXPORT ParameterEditor : public QWidget
 public:
 	ParameterEditor(ParameterList& parameters, QWidget* parent = nullptr);
 	~ParameterEditor() override;
-	//Sets the heading above the buttons. An empty title hides it.
-	void setTitle(const QString& title);
+	//Disable and hide auto-apply checkbox
+	void disableAutoApply();
+	//Sets the name of the parameter owner. An empty title hides it.
+	void setName(const QString& title);
 	//Binds the list and rebuilds the controls. Also called when its constraints change.
 	void load(ParameterList& parameters);
 	//Stores all fields if valid; returns false without changing the list otherwise.
@@ -50,6 +52,7 @@ private:
 	QList<Field> fields_;
 	Ui::ParameterEditor* ui_;
 	bool updating_ = false;
+	bool applying_ = false;
 
 	QWidget* createEditor(const Parameter& parameter);
 	QVariant editorValue(const Field& field) const;
