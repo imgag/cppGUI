@@ -171,32 +171,27 @@ void GUIHelper::resizeTableCellHeightsToFirst(QTableWidget* widget, bool only_vi
 	}
 }
 
-void GUIHelper::resizeTableHeight(QTableWidget* widget)
+void GUIHelper::resizeTableHeight(QTableWidget* table)
 {
-	int height = 0;
+	int height = 2+ 2 * table->frameWidth() + table->horizontalHeader()->height();
+	qDebug() << __LINE__ << height;
 
 	//rows
-	for (int i = 0; i < widget->verticalHeader()->count(); ++i)
+	for (int r = 0; r < table->rowCount(); ++r)
 	{
-		if (!widget->verticalHeader()->isSectionHidden(i))
-		{
-			height += widget->verticalHeader()->sectionSize(i);
-		}
+		if (table->isRowHidden(r)) continue;
+		height += table->rowHeight(r);
 	}
+	qDebug() << __LINE__ << height;
 
 	//scroll bar
-	if (!widget->horizontalScrollBar()->isHidden())
+	if (table->horizontalScrollBar()->isVisible())
 	{
-		height += widget->horizontalScrollBar()->height();
+		height += table->horizontalScrollBar()->height();
 	}
+	qDebug() << __LINE__ << height;
 
-	//header
-	if (!widget->horizontalHeader()->isHidden())
-	{
-		height += widget->horizontalHeader()->height();
-	}
-
-	widget->setMinimumHeight(height);
+	table->setFixedHeight(height);
 }
 
 QTableWidgetItem* GUIHelper::createTableItem(const QString& text, Qt::Alignment alignment, Qt::ItemFlags flags)
@@ -443,7 +438,7 @@ QChartView* GUIHelper::histogramChart(const Histogram& hist, QString title, int 
 
 	QChartView* view = new QChartView(chart);
 	view->setRenderHint(QPainter::Antialiasing);
-	view->setMinimumSize(1000, 800);
+	view->setMinimumSize(1200, 800);
 
 	return view;
 }

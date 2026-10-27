@@ -34,7 +34,7 @@ public:
 	static void resizeTableCellWidths(QTableWidget* widget, int max_col_width=-1, int max_used=200);
 	static void resizeTableCellHeightsToMinimum(QTableWidget* widget, int max_used=200);
 	static void resizeTableCellHeightsToFirst(QTableWidget* widget, bool only_visible=true);
-	///Resizes the table to height to show all rows
+	///Resizes the table to height to show all rows (sets maximum height)
 	static void resizeTableHeight(QTableWidget* widget);
 
 	///Creates a table cell item
