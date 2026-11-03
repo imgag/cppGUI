@@ -174,7 +174,6 @@ void GUIHelper::resizeTableCellHeightsToFirst(QTableWidget* widget, bool only_vi
 void GUIHelper::resizeTableHeight(QTableWidget* table)
 {
 	int height = 2+ 2 * table->frameWidth() + table->horizontalHeader()->height();
-	qDebug() << __LINE__ << height;
 
 	//rows
 	for (int r = 0; r < table->rowCount(); ++r)
@@ -182,14 +181,12 @@ void GUIHelper::resizeTableHeight(QTableWidget* table)
 		if (table->isRowHidden(r)) continue;
 		height += table->rowHeight(r);
 	}
-	qDebug() << __LINE__ << height;
 
 	//scroll bar
 	if (table->horizontalScrollBar()->isVisible())
 	{
 		height += table->horizontalScrollBar()->height();
 	}
-	qDebug() << __LINE__ << height;
 
 	table->setFixedHeight(height);
 }
