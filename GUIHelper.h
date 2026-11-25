@@ -12,6 +12,7 @@
 #include <QCompleter>
 #include <QMainWindow>
 #include <QLabel>
+#include <QProgressDialog>
 #include <QtCharts/QChartView>
 
 ///Auxilary helper functions for the GUI.
@@ -77,6 +78,9 @@ public:
 	///Depending on the ExceptionType, a critical, warning or notice dialog is shown.
 	///If a override cursor is set, it is removed before showing the dialog.
 	static void showException(QWidget* parent, const Exception& e, QString title);
+
+	///Returns a model progress dialog
+	static QSharedPointer<QProgressDialog> progressDialog(QWidget* parent, QString text, int min=0, int max=1, bool cancel_button=false);
 
 protected:
 	///Constructor declared away.

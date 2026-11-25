@@ -489,3 +489,14 @@ void GUIHelper::showException(QWidget* parent, const Exception& e, QString title
 	}
 }
 
+QSharedPointer<QProgressDialog> GUIHelper::progressDialog(QWidget* parent, QString text, int min, int max, bool cancel_button)
+{
+	QSharedPointer<QProgressDialog> dlg = QSharedPointer<QProgressDialog>(new QProgressDialog(text, cancel_button ? "cancel" : QString(), min, max, parent));
+	dlg->setWindowModality(Qt::ApplicationModal);
+	dlg->setMinimumDuration(0);
+	dlg->show();
+	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+
+	return dlg;
+}
+
